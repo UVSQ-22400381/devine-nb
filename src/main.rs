@@ -1,4 +1,3 @@
-use rand;
 use std::io;
 
 fn main() {
@@ -11,7 +10,7 @@ fn main() {
         nb_essai += 1;
         println!("Saisissez votre essai :");
         let mut essai = String::new();
-        if let Err(_) = io::stdin().read_line(&mut essai) {
+        if io::stdin().read_line(&mut essai).is_err() {
             println!("Saisie invalide");
             continue;
         }
