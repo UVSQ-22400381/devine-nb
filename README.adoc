@@ -1,0 +1,278 @@
+= Devine mon nombre !
+Stéphane Lopes <stephane.lopes@uvsq.fr>, Pablo de Oliveira Castro <pablo.oliveira@uvsq.fr>
+v2022-2023
+:stem:
+:icons: font
+:experimental:
+:source-highlighter: highlightjs
+
+L'objectif de ce TP est d'introduire les notions de base de Rust en réalisant un programme simple implémentant le jeu «Devine mon nombre !».
+Le programme tire un nombre aléatoire entre 1 et 100.
+Le joueur propose des nombres successifs.
+Après chaque tentative, le programme indique si le nombre proposé est trop grand, trop petit, ou si c'est la solution.
+
+Pour cela, le sujet est décomposé en plusieurs sections qui introduisent progressivement les différentes notions.
+Ce sujet est largement inspiré du chapitre https://doc.rust-lang.org/book/ch02-00-guessing-game-tutorial.html[Programming a Guessing Game] du livre https://doc.rust-lang.org/book/title-page.html[The Rust Programming Language].
+
+[CAUTION]
+====
+* Compilez et exécutez votre programme après chaque modification.
+* Pensez à valider régulièrement votre travail avec `git` (cf. https://hal91190.github.io/howto-git/[Introduction pratique à `git`]).
+* Respectez le https://doc.rust-lang.org/1.0.0/style/[guide de style] Rust dans votre code source.
+====
+
+== Première partie
+Cette première partie se concentre sur l'introduction des notions de base du langage.
+
+=== Initialiser le projet
+. Créez un répertoire `src` et ajoutez-y le fichier `devine_mon_nombre.rs` contenant le code source suivant.
++
+.Hello World en Rust
+[source,rust,indent=0]
+----
+fn main() {
+    println!("Hello World!");
+}
+----
++
+TIP: Le nom d'un _crate_ respecte la notation https://doc.rust-lang.org/1.0.0/style/style/naming/README.html[snake_case].
+. Compilez le programme avec `rustc` et vérifiez son bon fonctionnement en l'exécutant.
++
+.Quelles commandes avez-vous tapées ?
+....
+🡆 Répondre ici 🡄
+....
++
+NOTE: Le message `Hello world!` doit apparaître à l'écran.
+. Validez les changements avec `git`
++
+.Quelles commandes avez-vous tapées ?
+....
+🡆 Répondre ici 🡄
+....
+
+=== Lire un nombre
+. Modifiez le message affiché par le programme pour qu'apparaisse à l'écran :
++
+....
+Devine mon nombre !
+
+Saisissez votre proposition.
+....
++
+NOTE: Pensez à compiler et tester votre programme après chaque modification. Ce ne sera plus précisé par la suite.
+. Utilisez `read_line` pour lire une valeur saisie par l'utilisateur depuis l'https://doc.rust-lang.org/std/io/index.html#standard-input-and-output[entrée standard].
++
+Cette tâche simple en apparence n'est en fait pas du tout triviale : quel que soit le langage utilisé, elle nécessite une interaction avec le système d'exploitation, l'allocation d'un buffer destiné à recevoir la saisie, le passage de ce dernier à la fonction d'I/O (entrée/sortie) et enfin la gestion des erreurs et débordements de buffer.
++
+Dans le cas qui nous intéresse ici, le buffer sera une variable de type https://doc.rust-lang.org/std/string/struct.String.html[`String`] et nous utiliserons la fonction `read_line` pour lire une ligne de texte depuis l'entrée standard. Enfin, dans un premier temps, les erreurs seront tout simplement ignorées avec la méthode https://doc.rust-lang.org/std/result/enum.Result.html#method.unwrap[`unwrap`].
+
+.. Recherchez la fonction `read_line` (`std::io::Stdin::read_line`) dans la https://doc.rust-lang.org/std/index.html[documentation de la bibliothèque standard].
+.. Ajoutez à la fin de votre programme le code permettant la saisie et l'affichage de la valeur en ignorant, pour l'instant, la valeur de retour de `read_line`.
++
+NOTE: Inspirez-vous de l'exemple fourni dans la https://doc.rust-lang.org/std/io/index.html#standard-input-and-output[documentation de l'entrée et de la sortie standard].
+.. Que signifie la notation `&mut` devant le nom de la variable dans l'appel à `read_line` ?
++
+....
+🡆 Répondre ici 🡄
+....
+.. Quel est le type de retour de `read_line` ? Quel est son utilité ?
++
+....
+🡆 Répondre ici 🡄
+....
+.. Utilisez la méthode https://doc.rust-lang.org/std/result/enum.Result.html#method.unwrap[`unwrap`] pour désencapsuler la chaîne saisie.
+.. Affichez le nombre saisi à l'écran.
+
+NOTE: Pensez à valider régulièrement votre travail avec `git`. Ce ne sera plus précisé par la suite.
+
+=== Générer un nombre aléatoire
+La bibliothèque standard Rust ne fournit pas de moyen pour générer un nombre aléatoire.
+Il faudra donc faire appel à une bibliothèque externe pour cela, en l'occurrence le _crate_ https://crates.io/crates/rand[`rand`].
+
+Pour utiliser ce crate, nous allons faire appel à Cargo pour gérer la dépendance avec cette bibliothèque.
+
+. Migrez votre projet sous Cargo
+.. Tapez la commande https://doc.rust-lang.org/cargo/commands/cargo-init.html[`cargo init`] dans le répertoire de votre projet (celui contenant ce `README.adoc`).
+Quels fichiers et répertoires ont été générés par cette commande ?
++
+....
+🡆 Répondre ici 🡄
+....
+.. Déplacez `devine_mon_nombre.rs` vers `src/main.rs` en utilisant https://git-scm.com/docs/git-mv[`git mv`].
+.. Exécutez votre programme avec https://doc.rust-lang.org/cargo/commands/cargo-run.html[`cargo run`].
+Qu'est-ce qui a été généré dans le répertoire ?
++
+....
+🡆 Répondre ici 🡄
+....
+. Ajoutez la bibliothèque externe https://crates.io/crates/rand[`rand`] dans le projet
++
+Cargo conserve la description du projet dans le fichier `Cargo.toml`.
+Vous allez donc éditer ce fichier.
+
+.. Si nécessaire, modifiez l'attribut `name` en `devine_mon_nombre`
+.. En consultant la page du crate https://crates.io/crates/rand[`rand`], ajoutez la dépendance dans `Cargo.toml`.
+.. Construisez le projet avec https://doc.rust-lang.org/cargo/commands/cargo-build.html[`cargo build`].
+Que se passe-t'il lors du _build_ ?
++
+....
+🡆 Répondre ici 🡄
+....
+. Générez un nombre aléatoire avec https://docs.rs/rand/0.8.4/rand/trait.Rng.html#method.gen_range[rand::Rng::gen_range]
+.. Conservez le résultat de l'appel de `rand::thread_rng().gen_range(1..101)` dans une variable et construisez le projet. Lisez attentivement l'erreur obtenue.
+.. Ajoutez une clause `use` pour importer le _trait_ adapté et corriger l'erreur précédente.
+.. Faites afficher le nombre généré pour vérification pendant la mise au point du programme.
+
+=== Comparer le nombre saisi avec le nombre généré
+Dans cette section, nous allons partir d'une solution très impérative pour la comparaison puis la faire évoluer vers une approche plus fonctionnelle (et plus _rustacean_).
+
+. Convertissez en nombre la valeur saisie en utilisant la méthode https://doc.rust-lang.org/std/primitive.str.html#method.parse[`parse`].
++
+NOTE: Vous pouvez réutiliser le nom de la variable chaîne grâce au https://doc.rust-lang.org/book/ch03-01-variables-and-mutability.html#shadowing[_Shadowing_].
+. Testez l'égalité des deux nombres en utilisant une construction du type
++
+....
+if condition {
+  println!("Message")
+} else ...
+....
+. Modifiez le test avec `else if` pour prendre en compte les cas «_trop petit_» et «_trop grand_».
+. Remplacez la construction ci-dessus par une construction du type (expression `if`)
++
+....
+let message = if condition ...
+....
+. Faites évoluer le test en utilisant le https://doc.rust-lang.org/book/ch06-00-enums.html[_pattern matching_]
++
+L'opérateur `match` permet de comparer une valeur avec une série de patterns, comme par exemple les valeurs d'une énumération.
+
+.. Utilisez l'énumération https://doc.rust-lang.org/std/cmp/enum.Ordering.html[`std::cmp::Ordering`] et la méthode https://doc.rust-lang.org/std/cmp/trait.Ord.html#tymethod.cmp[`cmp`] pour générer une valeur enumérée à partir de la comparaison.
+.. Remplacez l'expression `if` par une expression `match` sur le résultat de la comparaison.
+
+=== Saisir plusieurs propositions
+. Englobez le code de saisie dans une boucle `loop`.
++
+NOTE: L'arrêt du programme peut se faire en utilisant kbd:[Ctrl+C] ou en saisissant une entrée incorrecte.
+. Ajoutez une condition pour sortir de la boucle avec `break`.
+
+=== Finaliser l'application (optionnelle)
+. Faites en sorte que le programme ignore les saisies incorrectes en utilisant `match` et l'énumération https://doc.rust-lang.org/std/result/enum.Result.html[std::io::Result] au niveau de `parse`.
+
+== Deuxième partie
+Cette seconde partie illustre l'usage des https://doc.rust-lang.org/book/appendix-04-useful-development-tools.html[outils de développement Rust] en réutilisant le code de la section précédente.
+
+=== Préparer le projet
+. Avant de commencer de nouveaux développements, créez une https://git-scm.com/book/fr/v2/Les-bases-de-Git-%C3%89tiquetage[_étiquette annotée_] (_tag_) git dénommée `v1.0.0` pour marquer la version du TP «Devine mon nombre !» en fin de première partie.
++
+.Quelles commandes avez-vous tapées ?
+....
+🡆 Répondre ici 🡄
+....
+. Créez une https://git-scm.com/book/fr/v2/Les-branches-avec-Git-Les-branches-en-bref[_branche_] (_branch_) git dénommée `devtools` pour les développements de ce TP.
+À la fin du TP, cette branche sera fusionnée dans `main`.
++
+.Quelles commandes avez-vous tapées ?
+....
+🡆 Répondre ici 🡄
+....
+. Utilisez https://github.com/rust-lang/rust-clippy[`cargo clippy`] pour vérifier votre code source et l'améliorer le cas échéant
++
+.Quels types de remarques `clippy` a-t'il fait ?
+....
+🡆 Répondre ici 🡄
+....
+. _Factorisez_ votre programme en extrayant les fonctions suivantes
++
+[horizontal]
+`fn read_int_from_stdin() -> Option<u32>`:: retourne l'entier saisi en ignorant les erreurs d'I/O ou de conversion
+`fn get_ordering(secret_number: u32, input: u32) -> Ordering`:: encapsule la comparaison entre le nombre secret et la saisie
+`fn display_result(comparison: Ordering)`:: affiche le message approprié en fonction du résultat de la comparaison
+`fn has_found(comparison: Ordering) -> bool`:: retourne `true` si le nombre a été trouvé
+
+[NOTE]
+====
+.La boucle principale devrait ensuite ressembler à
+[source,rust,indent=0]
+----
+    loop {
+        let input = read_int_from_stdin();
+
+        if let Some(input) = input { // if_let
+            let comparison = get_ordering(secret_number, input);
+            display_result(comparison);
+
+            if has_found(comparison) {
+                break;
+            }
+        } else {
+            println!("Saisie incorrecte");
+        }
+    }
+----
+====
+
+=== Documentation de l'API
+. Documentez le _crate_ (commentaires `//!`) et les fonctions (commentaires `///`) de votre programme en respectant les conventions de https://doc.rust-lang.org/rustdoc/what-is-rustdoc.html[`rustdoc`]
+. Exécutez `cargo doc` et visualisez le résultat
+. Ajoutez une section `# Examples` dans la documentation de l'une des fonctions
+
+=== Gestion du build
+. Dans quel répertoire Cargo place-t-il le résultat de la compilation ?
++
+....
+🡆 Répondre ici 🡄
+....
+. Lancez à nouveau une compilation avec Cargo mais en ajoutant l'option `--release`.
+Quelles différences voyez-vous ?
++
+....
+🡆 Répondre ici 🡄
+....
+. Masquez le message concernant la valeur du nombre secret lorsque le programme n'est plus en phase de mise au point.
++
+NOTE: Étudiez l'option https://doc.rust-lang.org/cargo/reference/profiles.html[`--release`] de Cargo, la https://doc.rust-lang.org/reference/conditional-compilation.html[compilation conditionnelle] et l'attribut https://doc.rust-lang.org/reference/conditional-compilation.html#debug_assertions[`debug_assertions`].
+. Ajoutez une dépendance vers la bibliothèque https://crates.io/crates/console[`console`]
++
+.Que fait cette bibliothèque ?
+....
+🡆 Répondre ici 🡄
+....
+. Modifiez votre programme pour que le titre soit affiché en bleu
+
+=== Tests unitaires
+. À la fin de votre code source, ajoutez un sous-module `tests` annoté avec `cfg(test)`
+. Ajoutez un https://doc.rust-lang.org/book/ch11-01-writing-tests.html[cas de test] pour la fonction `get_ordering`
+.. créez la fonction `twelve_equals_twelve`
+.. annotez-la avec `test`
+.. appelez `get_ordering` avec 12 pour les deux paramètres
++
+IMPORTANT: pensez à importer le module englobant dans le module de test (`use super::*;`)
+.. vérifiez le résultat avec `assert_eq!`
+. Complétez les tests avec les cas `twelve_greater_than_five` et `twelve_lesser_than_twenty`
+
+=== Finaliser le projet
+. Basculez sur la branche principale (`main`) et fusionnez les changements de la branche `devtools`
++
+.Quelles commandes avez-vous tapées ?
+....
+🡆 Répondre ici 🡄
+....
+. Créez une nouvelle étiquette pour cette version du projet
++
+.Quelles commandes avez-vous tapées ?
+....
+🡆 Répondre ici 🡄
+....
+. Synchronisez votre projet avec github et envoyez-y également les étiquettes
++
+.Quelles commandes avez-vous tapées ?
+....
+🡆 Répondre ici 🡄
+....
+. Supprimez la branche locale `devtools`
++
+.Quelles commandes avez-vous tapées ?
+....
+🡆 Répondre ici 🡄
+....
